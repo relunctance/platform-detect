@@ -1,0 +1,75 @@
+Metadata-Version: 2.4
+Name: platform-detect
+Version: 0.1.1
+Summary: Multi-platform path detection for AI agent skills — Hermes, OpenClaw, Claude Code, Codex, Cursor, VSCode
+Author-email: relunctance <maomao@gql.ai>
+License: MIT
+Project-URL: Homepage, https://github.com/relunctance/platform-detect
+Project-URL: Repository, https://github.com/relunctance/platform-detect
+Project-URL: Issues, https://github.com/relunctance/platform-detect/issues
+Keywords: platform,detection,hermes,openclaw,claude-code,agent,skill
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: build; extra == "dev"
+Requires-Dist: twine; extra == "dev"
+Dynamic: license-file
+
+# platform-detect
+
+> Multi-platform path detection for AI agent skills.
+
+**Supports**: Hermes (profile) / OpenClaw (workspace) / Claude Code / Codex / Cursor / VSCode
+
+## Install
+
+```bash
+pip install platform-detect
+```
+
+## Usage
+
+```python
+from platform_detect import detect, skill_dir, config_dir, state_file
+
+# Detect current platform
+platform = detect()  # -> 'hermes' | 'openclaw' | 'claude_code' | 'codex' | 'cursor' | 'vscode' | 'unknown'
+
+# Skill installation directory
+skill_dir('target-skill')  # -> ~/.hermes/skills/target-skill (Hermes)
+
+# Skill config/state directory (profile/workspace isolated)
+config_dir('my-skill')  # -> ~/.hermes/profiles/baijie/.my-skill
+
+# State file path
+state_file('.my-state.json')  # -> ~/.hermes/profiles/baijie/.my-state.json
+```
+
+## Platform paths
+
+| Platform | Skill Dir | Config Dir |
+|----------|-----------|------------|
+| Hermes | `~/.hermes/skills/<name>/` | `~/.hermes/profiles/<profile>/.<name>/` |
+| OpenClaw | `~/.openclaw/<workspace>/skills/<name>/` | `~/.openclaw/<workspace>/.<name>/` |
+| Claude Code | `~/.claude/skills/<name>/` | `~/.claude/.config/<name>/` |
+| Codex | `~/.codex/skills/<name>/` | `~/.codex/.config/<name>/` |
+| Cursor | `~/.cursor/plugins/<name>/` | `~/.cursor/.config/<name>/` |
+| VSCode | `~/.vscode/extensions/<name>/` | `~/.vscode/.config/<name>/` |
+
+## Zero dependencies
+
+Only uses Python standard library (`pathlib`, `os`, `platform`).
+
+## License
+
+MIT

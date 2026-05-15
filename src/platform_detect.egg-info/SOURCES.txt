@@ -1,0 +1,9 @@
+LICENSE
+README.md
+pyproject.toml
+src/platform_detect/__init__.py
+src/platform_detect.egg-info/PKG-INFO
+src/platform_detect.egg-info/SOURCES.txt
+src/platform_detect.egg-info/dependency_links.txt
+src/platform_detect.egg-info/requires.txt
+src/platform_detect.egg-info/top_level.txt

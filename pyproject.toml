@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "platform-detect"
-version = "0.1.0"
+version = "0.1.1"
 description = "Multi-platform path detection for AI agent skills — Hermes, OpenClaw, Claude Code, Codex, Cursor, VSCode"
 readme = "README.md"
 license = {text = "MIT"}

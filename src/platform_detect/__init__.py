@@ -17,8 +17,34 @@ import platform as _platform_mod
 from pathlib import Path
 from typing import Literal, Optional
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = ["detect", "skill_dir", "config_dir", "state_file"]
+
+# ─── 内部工具 ────────────────────────────────────────────────────────────────
+
+
+def _cwd() -> Path:
+    """安全获取当前工作目录，cwd 被删除时回退到 home"""
+    try:
+        return Path.cwd().resolve()
+    except FileNotFoundError:
+        return Path.home()
+
+
+def _home() -> Path:
+    """获取实际用户 home 目录，WSL Hermes profile 环境下返回 /home/<user>"""
+    if _platform_mod.system() == "Linux" and os.path.exists("/proc/version"):
+        with open("/proc/version") as f:
+            if "WSL" in f.read():
+                return Path(f"/home/{os.environ.get('USER', 'root')}")
+    return Path.home()
+
+
+def _ensure_dir(path: Path) -> Path:
+    """确保目录存在，返回 path 本身"""
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
 
 # ─── 平台检测 ────────────────────────────────────────────────────────────────
 
@@ -30,7 +56,7 @@ def detect() -> Literal["hermes", "openclaw", "claude_code", "codex", "cursor", 
     判断优先级：
     1. HERMES_PLATFORM 环境变量（显式设置）
     2. Hermes profile：Path.home() 包含 .hermes/profiles/
-    3. OpenClaw：Path.home() 包含 .openclaw/workspace
+    3. OpenClaw：cwd 在 ~/.openclaw/workspace*/ 下
     4. Claude Code：~/.claude/ 目录存在
     5. Codex：~/.codex/ 目录存在
     6. Cursor：~/.cursor/ 目录存在
@@ -52,7 +78,8 @@ def detect() -> Literal["hermes", "openclaw", "claude_code", "codex", "cursor", 
     # OpenClaw workspace 环境
     openclaw_base = home / ".openclaw"
     if openclaw_base.exists():
-        for parent in [Path.cwd().resolve()] + list(Path.cwd().resolve().parents):
+        cwd = _cwd()
+        for parent in [cwd] + list(cwd.parents):
             if str(parent).startswith(str(openclaw_base / "workspace")):
                 return "openclaw"
 
@@ -95,7 +122,7 @@ def _detect_openclaw_workspace() -> str:
     if not openclaw_base.exists():
         return "workspace"
 
-    cwd = Path.cwd().resolve()
+    cwd = _cwd()
     for parent in [cwd] + list(cwd.parents):
         parent_str = str(parent)
         if parent_str.startswith(str(openclaw_base / "workspace")):
@@ -105,24 +132,6 @@ def _detect_openclaw_workspace() -> str:
                     return part
             return "workspace"
     return "workspace"
-
-
-# ─── 基础路径 ────────────────────────────────────────────────────────────────
-
-
-def _home() -> Path:
-    """获取实际用户 home 目录，WSL Hermes profile 环境下返回 /home/<user>"""
-    if _platform_mod.system() == "Linux" and os.path.exists("/proc/version"):
-        with open("/proc/version") as f:
-            if "WSL" in f.read():
-                return Path(f"/home/{os.environ.get('USER', 'root')}")
-    return Path.home()
-
-
-def _ensure_dir(path: Path) -> Path:
-    """确保目录存在，返回 path 本身"""
-    path.mkdir(parents=True, exist_ok=True)
-    return path
 
 
 # ─── 标准路径 API ────────────────────────────────────────────────────────────
